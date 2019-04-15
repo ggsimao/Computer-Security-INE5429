@@ -96,32 +96,72 @@ def modulo(b, e, m):
     return x % m
 
 def jacobi(a, b):
-    if b <= 0 or (b % 2) == 0:
+    if a == 0:
         return 0
     j = 1
     if a < 0:
         a = -a
-        if (b % 4) == 3:
+        if b % 4 == 3:
             j = -j
+    if a == 1:
+        return j
     while a != 0:
-        while (a % 2) == 0:
-            a = int(a / 2)
-            if (b % 8) == 3 or (b % 8) == 5:
+        if a < 0:
+            a = -a
+            if b % 4 == 3:
+                j = -j
+        while a % 2 == 0:
+            a = a / 2
+            if b % 8 == 3 or b % 8 == 5:
                 j = -j
         temp = a
         a = b
         b = temp
-        if (a % 4) == 3 and (b % 4) == 3:
+        if a % 4 == 3 and b % 4 == 3:
             j = -j
         a = a % b
+        if a > b / 2:
+            a = a - b
     if b == 1:
         return j
-    else:
-        return 0
+    return 0
 
+def miller_rabin(number, accuracy):
+    if number == 1:
+        return False
+    if number == 2 or number == 3:
+        return True
+    d = number - 1
+    r = 0
+    while d % 2 == 0:
+        d >>= 1
+        r+=1
+    a = 0
+    for k in range(accuracy):
+        a = 2 + (random.getrandbits(number.bit_length()+1) % (number - 3))
+        x = (a**d) % number
+        if x == 1 or x == number - 1:
+            continue
+        cont = False
+        for i in range(r - 1):
+            x = (x**2) % number
+            if x == 1:
+                return False
+            if x == number - 1:
+                cont = True
+                break
+        if cont:
+            continue
+        return False
+    return True
 
 
 if __name__ == "__main__":
+    listofprimes = []
+    for i in range(1, 100):
+        if miller_rabin(i, 50):
+            listofprimes.append(i)
+    print(listofprimes)
     listofprimes = []
     for i in range(1, 100):
         if solovay_strassen(i, 50):
